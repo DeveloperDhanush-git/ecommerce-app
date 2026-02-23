@@ -1,70 +1,93 @@
-# Ecommerce App — Docker Setup
+# 🛒 Ecommerce App
 
 A full-stack ecommerce application with:
-- **Frontend**: React + Vite (served via Nginx)
-- **Backend**: Node.js + Express
-- **Database**: MySQL 8
-- **Search**: Elasticsearch 8
+
+- **Frontend** — React + Vite (served via Nginx)
+- **Backend** — Node.js + Express REST API
+- **Database** — MySQL 8 (auto-seeded with 100 products across 10 categories)
+- **Search** — Elasticsearch 8 (synonym-aware full-text search)
+
+Everything runs inside Docker — no need to install Node.js, MySQL, or anything else locally.
 
 ---
 
-## 🚀 Quick Start with Docker
+## 🚀 Quick Start (3 commands)
 
-### 1. Prerequisites
-- [Docker](https://docs.docker.com/get-docker/) ≥ 24.x
-- [Docker Compose](https://docs.docker.com/compose/install/) ≥ 2.x
+### Prerequisites
+- [Docker Desktop](https://docs.docker.com/get-docker/) ≥ 24.x installed and running
 
-### 2. Configure Environment Variables
+### 1. Clone the repository
+
+```bash
+git clone <your-repo-url>
+cd ecommerce-app
+```
+
+### 2. Set up environment variables
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and set **strong passwords** and a **random JWT secret**:
+> ✅ The default values in `.env.example` work immediately — no editing required.
 
-```bash
-# Generate a secure JWT secret
-openssl rand -hex 64
-```
-
-### 3. Build & Start All Services
+### 3. Build & start all services
 
 ```bash
 docker compose up --build -d
 ```
 
-This will start:
-| Service         | URL / Port                    |
-|-----------------|-------------------------------|
-| Frontend (Nginx) | http://localhost              |
-| Backend API      | http://localhost:5000         |
-| MySQL            | localhost:3306                |
-| Elasticsearch    | http://localhost:9200         |
+That's it! Docker will:
+- Build the backend and frontend images
+- Start MySQL and **automatically create the database + all tables + seed 100 products**
+- Start Elasticsearch and sync all products into the search index
+- Serve the frontend on **http://localhost**
 
-### 4. View Logs
+---
+
+## 🌐 Service URLs
+
+| Service | URL |
+|---|---|
+| **Frontend** | http://localhost |
+| **Backend API** | http://localhost:5000 |
+| **MySQL** | localhost:3307 |
+| **Elasticsearch** | http://localhost:9201 |
+
+---
+
+## 📋 Useful Commands
 
 ```bash
-# All services
+# View logs for all services
 docker compose logs -f
 
-# Specific service
+# View logs for a specific service
 docker compose logs -f backend
-docker compose logs -f frontend
 docker compose logs -f mysql
 docker compose logs -f elasticsearch
-```
+docker compose logs -f frontend
 
-### 5. Stop Services
-
-```bash
+# Stop all services (keeps database data)
 docker compose down
-```
 
-### 6. Stop & Remove Volumes (⚠️ deletes database data)
-
-```bash
+# Stop and wipe all data (fresh start)
 docker compose down -v
+docker compose up --build -d
 ```
+
+---
+
+## 🗄️ Database
+
+The database is **automatically initialized** on the very first run:
+
+- ✅ Creates the `ecommerce` database
+- ✅ Creates all tables (`users`, `categories`, `products`, `category_synonyms`)
+- ✅ Seeds **10 categories** and **100 products** (10 per category)
+
+> ⚠️ The seed script only runs **once** — when the `mysql_data` Docker volume is created for the first time.
+> If you want to reset and re-seed: `docker compose down -v && docker compose up -d`
 
 ---
 
@@ -72,26 +95,30 @@ docker compose down -v
 
 ```
 ecommerce-app/
-├── docker-compose.yml          # Orchestrates all services
-├── .env.example                # Environment variable template
-├── .env                        # Your local env (NOT committed to git)
+├── docker-compose.yml              # Orchestrates all 4 services
+├── .env.example                    # Copy this to .env
+├── init.sql                        # DB schema + seed data (auto-runs on first start)
 ├── ecommerce-backend/
-│   ├── Dockerfile              # Backend image definition
-│   ├── .dockerignore
-│   └── ...
+│   ├── Dockerfile
+│   ├── server.js
+│   ├── config/                     # db.js, elasticsearch.js
+│   ├── controllers/
+│   ├── routes/
+│   └── utils/                      # Elasticsearch index + sync
 └── frontend/
-    ├── Dockerfile              # Multi-stage build → Nginx
-    ├── nginx.conf              # Nginx config (SPA + API proxy)
-    ├── .dockerignore
-    └── ...
+    ├── Dockerfile                  # Multi-stage build → Nginx
+    ├── nginx.conf                  # SPA routing + API proxy
+    └── src/
 ```
 
 ---
 
-## 🔒 Production Notes
+## 🔒 Production Checklist
 
-- Change all default passwords in `.env` before deploying
-- Use a secrets manager (AWS Secrets Manager, Vault, etc.) in production
-- Enable Elasticsearch security (`xpack.security.enabled=true`) in production
-- Serve over HTTPS using a reverse proxy like Nginx/Traefik with SSL certificates
-- Use a managed database service (RDS, Cloud SQL) for better reliability in production
+Before deploying to a real server:
+
+- [ ] Change all passwords in `.env` to strong unique values
+- [ ] Generate a secure JWT secret: `openssl rand -hex 64`
+- [ ] Enable Elasticsearch security (`xpack.security.enabled=true`)
+- [ ] Use HTTPS with a reverse proxy (Nginx/Traefik + Let's Encrypt)
+- [ ] Use a managed database (AWS RDS, Cloud SQL) instead of a Docker container
