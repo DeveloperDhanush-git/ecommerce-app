@@ -15,7 +15,6 @@ services:
       - "3307:3306"   # 3307 on host → avoids conflict with local MySQL on 3306
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - ecommerce_network
     healthcheck:
