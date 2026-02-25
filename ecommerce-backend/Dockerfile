@@ -24,7 +24,10 @@ RUN chown -R appuser:appgroup /app
 # Switch to non-root user
 USER appuser
 
-# Expose the backend port
+# Set NODE_ENV to production at image level
+ENV NODE_ENV=production
+
+# Expose the backend port (documentation only — actual binding via compose)
 EXPOSE 5000
 
 # Start the server
