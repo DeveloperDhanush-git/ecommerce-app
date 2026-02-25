@@ -1,8 +1,6 @@
 function Pagination({ currentPage, totalPages, onPageChange }) {
-
   return (
     <div className="flex justify-center items-center gap-2 flex-wrap">
-
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -16,9 +14,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
           key={index}
           onClick={() => onPageChange(index + 1)}
           className={`px-3 py-1 border rounded ${
-            currentPage === index + 1
-              ? "bg-yellow-400 font-semibold"
-              : ""
+            currentPage === index + 1 ? "bg-yellow-400 font-semibold" : ""
           }`}
         >
           {index + 1}
@@ -32,7 +28,6 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
       >
         Next
       </button>
-
     </div>
   );
 }

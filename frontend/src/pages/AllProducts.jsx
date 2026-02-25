@@ -4,9 +4,7 @@ import api from "../utils/api";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
 
-
 function AllProducts() {
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchQuery = searchParams.get("search") || "";
@@ -23,7 +21,7 @@ function AllProducts() {
     if (!searchParams.get("page")) {
       setSearchParams({
         page: 1,
-        search: searchQuery
+        search: searchQuery,
       });
     }
   }, []);
@@ -38,13 +36,11 @@ function AllProducts() {
       setLoading(true);
 
       const res = await api.get(
-        `/api/products?page=${currentPage}&limit=${productsPerPage}&search=${searchQuery}`
-
+        `/api/products?page=${currentPage}&limit=${productsPerPage}&search=${searchQuery}`,
       );
 
       setProducts(res.data.products);
       setTotalProducts(res.data.total);
-
     } catch (error) {
       console.error("Error fetching products", error);
     } finally {
@@ -62,10 +58,7 @@ function AllProducts() {
 
   return (
     <div className="pt-20 bg-gray-100 min-h-screen p-6">
-
-      <h2 className="text-2xl font-bold mb-4">
-        All Products
-      </h2>
+      <h2 className="text-2xl font-bold mb-4">All Products</h2>
       {searchQuery && (
         <p className="mb-4 text-sm text-gray-700">
           Showing results for
@@ -100,17 +93,14 @@ function AllProducts() {
           <hr className="my-8" />
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">
-                Products per page:
-              </span>
+              <span className="text-sm text-gray-600">Products per page:</span>
               <select
                 value={productsPerPage}
                 onChange={(e) => {
                   setSearchParams({
                     page: 1,
-                    search: searchQuery
+                    search: searchQuery,
                   });
                   setProductsPerPage(Number(e.target.value));
                 }}
@@ -129,7 +119,7 @@ function AllProducts() {
               onPageChange={(page) => {
                 setSearchParams({
                   page,
-                  search: searchQuery
+                  search: searchQuery,
                 });
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}

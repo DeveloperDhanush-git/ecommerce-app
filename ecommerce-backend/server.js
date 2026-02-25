@@ -55,17 +55,17 @@ const setupElasticsearch = async () => {
                     "fridge, refrigerator",
                     "ac, air conditioner",
                     "book, books",
-                    "kitchen, cookware, utensils"
-                  ]
-                }
+                    "kitchen, cookware, utensils",
+                  ],
+                },
               },
               analyzer: {
                 custom_analyzer: {
                   tokenizer: "standard",
-                  filter: ["lowercase", "synonym_filter", "porter_stem"]
-                }
-              }
-            }
+                  filter: ["lowercase", "synonym_filter", "porter_stem"],
+                },
+              },
+            },
           },
           mappings: {
             properties: {
@@ -73,10 +73,10 @@ const setupElasticsearch = async () => {
               description: { type: "text", analyzer: "custom_analyzer" },
               price: { type: "float" },
               catid: { type: "integer" },
-              dateinserted: { type: "date" }
-            }
-          }
-        }
+              dateinserted: { type: "date" },
+            },
+          },
+        },
       });
       console.log("✅ Elasticsearch index 'products' created");
     } else {
@@ -96,7 +96,7 @@ const setupElasticsearch = async () => {
             description: product.description,
             price: parseFloat(product.price),
             catid: product.catid,
-          }
+          },
         );
       });
 
@@ -105,7 +105,6 @@ const setupElasticsearch = async () => {
     } else {
       console.log("⚠️  No products found in DB to sync");
     }
-
   } catch (error) {
     console.error("❌ Elasticsearch setup failed:", error.message);
     // Don't crash the server — ES may not be critical for all routes

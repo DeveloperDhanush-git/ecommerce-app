@@ -8,20 +8,18 @@ export const getCategories = async (req, res) => {
   try {
     const [categories] = await db.query(
       "SELECT * FROM categories LIMIT ? OFFSET ?",
-      [limit, offset]
+      [limit, offset],
     );
 
     const [[{ total }]] = await db.query(
-      "SELECT COUNT(*) as total FROM categories"
+      "SELECT COUNT(*) as total FROM categories",
     );
 
     res.json({
       categories,
-      total
+      total,
     });
-
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
-

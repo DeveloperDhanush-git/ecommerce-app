@@ -22,12 +22,11 @@ function CategoryProducts() {
   const fetchProducts = async () => {
     try {
       const res = await api.get(
-        `/api/products?catid=${id}&page=${currentPage}&limit=${productsPerPage}`
+        `/api/products?catid=${id}&page=${currentPage}&limit=${productsPerPage}`,
       );
 
       setProducts(res.data.products);
       setTotalProducts(res.data.total);
-
     } catch (error) {
       console.error(error);
     }
@@ -41,7 +40,6 @@ function CategoryProducts() {
 
   return (
     <div className="pt-20 bg-gray-100 min-h-screen p-6">
-
       <h2 className="text-2xl font-bold mb-4 capitalize">
         {categoryName.replace(/-/g, " ")}
       </h2>

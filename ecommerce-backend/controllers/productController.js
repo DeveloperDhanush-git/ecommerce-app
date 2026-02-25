@@ -18,7 +18,7 @@ export const searchProducts = async (req, res) => {
     // 🔥 Extract price number-only search (e.g., "20000")
     if (/^\d+$/.test(cleanSearch)) {
       priceRange = {
-        range: { price: { lte: parseInt(cleanSearch) } }
+        range: { price: { lte: parseInt(cleanSearch) } },
       };
       cleanSearch = "";
     }
@@ -37,62 +37,56 @@ export const searchProducts = async (req, res) => {
       cleanSearch = cleanSearch.replace(/above\s\d+/, "").trim();
     }
 
-// 🔥 Normalize helper
-const normalize = (text) =>
-  text
-    .toLowerCase()
-    .replace(/&/g, " ")
-    .replace(/and/g, " ")
-    .replace(/[^a-z0-9\s]/g, "")
-    .trim();
+    // 🔥 Normalize helper
+    const normalize = (text) =>
+      text
+        .toLowerCase()
+        .replace(/&/g, " ")
+        .replace(/and/g, " ")
+        .replace(/[^a-z0-9\s]/g, "")
+        .trim();
 
-const searchWords = normalize(cleanSearch).split(/\s+/);
+    const searchWords = normalize(cleanSearch).split(/\s+/);
 
-// 🔥 Fetch categories + synonyms using JOIN
-const [rows] = await db.query(`
+    // 🔥 Fetch categories + synonyms using JOIN
+    const [rows] = await db.query(`
   SELECT c.catid, c.catname, cs.synonym
   FROM categories c
   LEFT JOIN category_synonyms cs ON c.catid = cs.catid
 `);
 
-let categoryMap = {};
+    let categoryMap = {};
 
-rows.forEach(row => {
-  if (!categoryMap[row.catid]) {
-    categoryMap[row.catid] = {
-      catname: row.catname,
-      words: []
-    };
-  }
+    rows.forEach((row) => {
+      if (!categoryMap[row.catid]) {
+        categoryMap[row.catid] = {
+          catname: row.catname,
+          words: [],
+        };
+      }
 
-  categoryMap[row.catid].words.push(
-    normalize(row.catname)
-  );
+      categoryMap[row.catid].words.push(normalize(row.catname));
 
-  if (row.synonym) {
-    categoryMap[row.catid].words.push(
-      normalize(row.synonym)
-    );
-  }
-});
+      if (row.synonym) {
+        categoryMap[row.catid].words.push(normalize(row.synonym));
+      }
+    });
 
-for (const catid in categoryMap) {
-  const words = categoryMap[catid].words.flatMap(w => w.split(/\s+/));
+    for (const catid in categoryMap) {
+      const words = categoryMap[catid].words.flatMap((w) => w.split(/\s+/));
 
-  const matched = searchWords.some(word =>
-    words.includes(word)
-  );
+      const matched = searchWords.some((word) => words.includes(word));
 
-  if (matched) {
-    categoryFilter = { term: { catid: parseInt(catid) } };
+      if (matched) {
+        categoryFilter = { term: { catid: parseInt(catid) } };
 
-    cleanSearch = searchWords
-      .filter(word => !words.includes(word))
-      .join(" ");
+        cleanSearch = searchWords
+          .filter((word) => !words.includes(word))
+          .join(" ");
 
-    break;
-  }
-}
+        break;
+      }
+    }
 
     const mustQueries = [];
     const filterQueries = [];
@@ -104,15 +98,15 @@ for (const catid in categoryMap) {
           query: cleanSearch,
           fields: ["proname^4", "description^2"],
           fuzziness: "AUTO",
-          minimum_should_match: "75%"
-        }
+          minimum_should_match: "75%",
+        },
       });
     }
 
     // Category filter from URL
     if (catid) {
       filterQueries.push({
-        term: { catid: parseInt(catid) }
+        term: { catid: parseInt(catid) },
       });
     }
 
@@ -139,21 +133,20 @@ for (const catid in categoryMap) {
       query: {
         bool: {
           must: mustQueries.length ? mustQueries : [{ match_all: {} }],
-          filter: filterQueries
-        }
-      }
+          filter: filterQueries,
+        },
+      },
     });
 
-    const products = result.hits.hits.map(hit => ({
+    const products = result.hits.hits.map((hit) => ({
       prodid: hit._id,
-      ...hit._source
+      ...hit._source,
     }));
 
     res.json({
       products,
-      total: result.hits.total.value
+      total: result.hits.total.value,
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Search failed" });

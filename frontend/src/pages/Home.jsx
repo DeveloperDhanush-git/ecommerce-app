@@ -5,7 +5,6 @@ import CategoryCard from "../components/CategoryCard";
 import Pagination from "../components/Pagination";
 
 function Home() {
-
   const [searchParams, setSearchParams] = useSearchParams();
   const pageFromUrl = parseInt(searchParams.get("page")) || 1;
 
@@ -24,12 +23,11 @@ function Home() {
       setLoading(true);
 
       const res = await api.get(
-        `/api/categories?page=${currentPage}&limit=${categoriesPerPage}`
+        `/api/categories?page=${currentPage}&limit=${categoriesPerPage}`,
       );
 
       setCategories(res.data.categories);
       setTotalCategories(res.data.total);
-
     } catch (error) {
       console.error("Error fetching categories", error);
     } finally {
@@ -45,14 +43,12 @@ function Home() {
 
   return (
     <div className="pt-20 bg-gray-100 min-h-screen p-6">
-
-      <h2 className="text-2xl font-bold mb-4">
-        Shop by Category
-      </h2>
+      <h2 className="text-2xl font-bold mb-4">Shop by Category</h2>
 
       <p className="text-sm mb-4 text-gray-600">
         Showing {(currentPage - 1) * categoriesPerPage + 1} –
-        {Math.min(currentPage * categoriesPerPage, totalCategories)} of {totalCategories} categories
+        {Math.min(currentPage * categoriesPerPage, totalCategories)} of{" "}
+        {totalCategories} categories
       </p>
 
       {loading ? (
@@ -74,7 +70,6 @@ function Home() {
           <hr className="my-8" />
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-
             {/* Per Page Selector */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">
@@ -106,7 +101,6 @@ function Home() {
                 }
               }}
             />
-
           </div>
         </>
       )}

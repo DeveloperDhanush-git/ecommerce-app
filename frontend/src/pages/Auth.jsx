@@ -6,12 +6,13 @@ import { toast } from "react-toastify";
 function Auth() {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -71,7 +72,7 @@ function Auth() {
 
     setErrors((prev) => ({
       ...prev,
-      [e.target.name]: message
+      [e.target.name]: message,
     }));
   };
 
@@ -81,7 +82,6 @@ function Auth() {
 
   // 🔥 Proper Submit Validation
   const handleSubmit = async () => {
-
     // Clear previous errors
     setErrors({});
 
@@ -105,43 +105,30 @@ function Auth() {
     }
 
     try {
-
       if (isLogin) {
-
         // 🔹 LOGIN (Backend handles validation)
-        const res = await api.post(
-          "/api/auth/login",
-          {
-            email: form.email.trim(),
-            password: form.password
-          }
-        );
+        const res = await api.post("/api/auth/login", {
+          email: form.email.trim(),
+          password: form.password,
+        });
 
         localStorage.setItem("token", res.data.token);
 
         toast.success("Login successful");
         navigate("/");
-
       } else {
-
         // 🔹 REGISTER
-        await api.post(
-          "/api/auth/register",
-          {
-            name: form.name.trim(),
-            email: form.email.trim(),
-            password: form.password
-          }
-        );
+        await api.post("/api/auth/register", {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          password: form.password,
+        });
 
         toast.success("Account created successfully");
         setIsLogin(true);
       }
-
     } catch (error) {
-
-      const message =
-        error.response?.data?.message || "Something went wrong";
+      const message = error.response?.data?.message || "Something went wrong";
 
       // 🔥 Real-world error mapping
       if (isLogin) {
@@ -153,19 +140,16 @@ function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center pt-10">
-      <div className="border border-gray-300 w-[450px] p-6 rounded-md">
-
-        <h2 className="text-2xl mb-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <div className="border border-gray-300 w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-[550px] p-6 sm:p-8 rounded-md shadow-sm">
+        <h2 className="text-xl sm:text-2xl mb-4 text-center sm:text-left">
           {isLogin ? "Sign-In" : "Create account"}
         </h2>
 
         {/* Name */}
         {!isLogin && (
           <div className="mb-4">
-            <label className="block text-sm font-semibold">
-              Your name
-            </label>
+            <label className="block text-sm font-semibold">Your name</label>
             <input
               type="text"
               name="name"
@@ -175,18 +159,14 @@ function Auth() {
               className="w-full mt-1 px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-yellow-500"
             />
             {errors.name && (
-              <p className="text-red-600 text-sm mt-1">
-                {errors.name}
-              </p>
+              <p className="text-red-600 text-sm mt-1">{errors.name}</p>
             )}
           </div>
         )}
 
         {/* Email */}
         <div className="mb-4">
-          <label className="block text-sm font-semibold">
-            Email
-          </label>
+          <label className="block text-sm font-semibold">Email</label>
           <input
             type="text"
             name="email"
@@ -196,69 +176,105 @@ function Auth() {
             className="w-full mt-1 px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-yellow-500"
           />
           {errors.email && (
-            <p className="text-red-600 text-sm mt-1">
-              {errors.email}
-            </p>
+            <p className="text-red-600 text-sm mt-1">{errors.email}</p>
           )}
         </div>
 
         {/* Password */}
-        <div className="mb-4">
-          <label className="block text-sm font-semibold">
-            Password
-          </label>
+        <div className="mb-4 relative">
+          <label className="block text-sm font-semibold">Password</label>
 
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             value={form.password}
             onChange={handleChange}
             onBlur={handleBlur}
-            className="w-full mt-1 px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-yellow-500"
+            className="w-full mt-1 px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 pr-16"
           />
 
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-9 text-sm text-blue-600"
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+
           {!isLogin && (
-            <div className="mt-2 text-xs grid grid-cols-2 gap-x-4 gap-y-1">
-              <p className={form.password.length >= 8 ? "text-green-600" : "text-gray-500"}>
+            <div className="mt-2 text-[10px] flex flex-wrap gap-1">
+              <p
+                className={
+                  form.password.length >= 8 ? "text-green-600" : "text-gray-800"
+                }
+              >
                 • At least 8 characters
               </p>
-              <p className={/[A-Z]/.test(form.password) ? "text-green-600" : "text-gray-500"}>
+              <p
+                className={
+                  /[A-Z]/.test(form.password)
+                    ? "text-green-600"
+                    : "text-gray-800"
+                }
+              >
                 • One uppercase letter
               </p>
-              <p className={/[a-z]/.test(form.password) ? "text-green-600" : "text-gray-500"}>
+              <p
+                className={
+                  /[a-z]/.test(form.password)
+                    ? "text-green-600"
+                    : "text-gray-800"
+                }
+              >
                 • One lowercase letter
               </p>
-              <p className={/[0-9]/.test(form.password) ? "text-green-600" : "text-gray-500"}>
+              <p
+                className={
+                  /[0-9]/.test(form.password)
+                    ? "text-green-600"
+                    : "text-gray-800"
+                }
+              >
                 • One number
               </p>
-              <p className={/[!@#$%^&*]/.test(form.password) ? "text-green-600" : "text-gray-500"}>
-                • One special character (!@#$%^&*)
+              <p
+                className={
+                  /[!@#$%^&*]/.test(form.password)
+                    ? "text-green-600"
+                    : "text-gray-800"
+                }
+              >
+                • One special character
               </p>
             </div>
           )}
 
           {errors.password && (
-            <p className="text-red-600 text-sm mt-2">
-              {errors.password}
-            </p>
+            <p className="text-red-600 text-sm mt-2">{errors.password}</p>
           )}
         </div>
 
-
         {/* Confirm Password */}
         {!isLogin && (
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label className="block text-sm font-semibold">
               Re-enter password
             </label>
             <input
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
               value={form.confirmPassword}
               onChange={handleChange}
               onBlur={handleBlur}
               className="w-full mt-1 px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-yellow-500"
             />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-9 text-sm text-blue-600"
+            >
+              {showConfirmPassword ? "Hide" : "Show"}
+            </button>
             {errors.confirmPassword && (
               <p className="text-red-600 text-sm mt-1">
                 {errors.confirmPassword}
@@ -274,7 +290,6 @@ function Auth() {
         >
           {isLogin ? "Sign-In" : "Create your account"}
         </button>
-
 
         <hr className="my-4" />
 

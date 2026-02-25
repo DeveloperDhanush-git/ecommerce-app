@@ -30,7 +30,6 @@ function App() {
       {!hideNavbar && <Navbar />}
 
       <Routes>
-
         {/* 🔐 Protected Routes */}
 
         {/* 🔥 Categories Page */}
@@ -67,7 +66,6 @@ function App() {
         <Route path="/auth" element={<Auth />} />
 
         <Route path="*" element={<Navigate to="/categories" />} />
-
       </Routes>
 
       <ToastContainer

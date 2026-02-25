@@ -24,14 +24,13 @@ const syncProducts = async () => {
           description: product.description,
           price: parseFloat(product.price),
           catid: product.catid,
-        }
+        },
       );
     });
 
     await client.bulk({ refresh: true, body });
 
     console.log("✅ Products synced successfully to Elasticsearch");
-
   } catch (error) {
     console.error("❌ Sync failed:", error);
   }

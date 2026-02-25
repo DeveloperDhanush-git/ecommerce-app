@@ -68,16 +68,18 @@ function Navbar() {
     navigate("/auth");
   };
 
-const handleSearch = () => {
-  if (search.trim()) {
-    navigate(`/allproducts?page=1&search=${encodeURIComponent(search.trim())}`);
-  } else {
-    navigate("/allproducts?page=1");
-  }
-};
-const handleBack =()=>{
-  navigate("/")
-}
+  const handleSearch = () => {
+    if (search.trim()) {
+      navigate(
+        `/allproducts?page=1&search=${encodeURIComponent(search.trim())}`,
+      );
+    } else {
+      navigate("/allproducts?page=1");
+    }
+  };
+  const handleBack = () => {
+    navigate("/");
+  };
 
   return (
     <nav
@@ -94,34 +96,38 @@ const handleBack =()=>{
 
       {/* 🔍 Search Bar */}
       <div className="hidden md:flex flex-1 mx-6 max-w-2xl">
-        <button className="bg-yellow-400 px-4 text-black font-semibold hover:bg-yellow-500"
-        onClick={handleBack}
-        >Back</button>
+        <button
+          className="bg-yellow-400 px-4 text-black font-semibold hover:bg-yellow-500"
+          onClick={handleBack}
+        >
+          Back
+        </button>
         <input
-  type="text"
-  placeholder="Search products..."
-  value={search}
-  onChange={(e) => {
-    const value = e.target.value;
-    setSearch(value);
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSearch(value);
 
-    // 🔥 If user clears search → show all products
-    if (value.trim() === "" && location.pathname === "/allproducts") {
-      navigate("/allproducts?page=1");
-    }
-  }}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      if (search.trim()) {
-        navigate(`/allproducts?page=1&search=${encodeURIComponent(search.trim())}`);
-      } else {
-        navigate("/allproducts?page=1");
-      }
-    }
-  }}
-  className="flex-1 px-4 py-2 text-black outline-none"
-/>
-
+            // 🔥 If user clears search → show all products
+            if (value.trim() === "" && location.pathname === "/allproducts") {
+              navigate("/allproducts?page=1");
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              if (search.trim()) {
+                navigate(
+                  `/allproducts?page=1&search=${encodeURIComponent(search.trim())}`,
+                );
+              } else {
+                navigate("/allproducts?page=1");
+              }
+            }
+          }}
+          className="flex-1 px-4 py-2 text-black outline-none"
+        />
 
         <button
           onClick={handleSearch}
@@ -133,7 +139,6 @@ const handleBack =()=>{
 
       {/* Nav Links */}
       <div className="flex items-center gap-6 text-sm">
-
         <Link to="/categories" className="hover:underline">
           Home
         </Link>
@@ -151,7 +156,6 @@ const handleBack =()=>{
             Login
           </Link>
         )}
-
       </div>
     </nav>
   );

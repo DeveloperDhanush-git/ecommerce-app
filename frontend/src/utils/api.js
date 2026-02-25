@@ -10,20 +10,20 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "/",          // relative — handled by Nginx proxy in Docker, Vite proxy in dev
-    timeout: 15000,
-    headers: {
-        "Content-Type": "application/json",
-    },
+  baseURL: "/", // relative — handled by Nginx proxy in Docker, Vite proxy in dev
+  timeout: 15000,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Attach JWT token automatically to every request if present
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default api;

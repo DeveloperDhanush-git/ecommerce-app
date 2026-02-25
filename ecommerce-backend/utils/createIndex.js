@@ -4,7 +4,7 @@ import { Client } from "@elastic/elasticsearch";
 dotenv.config();
 
 const client = new Client({
-  node: process.env.ELASTICSEARCH_URL || "http://localhost:9200"
+  node: process.env.ELASTICSEARCH_URL || "http://localhost:9200",
 });
 
 const createIndex = async () => {
@@ -32,42 +32,37 @@ const createIndex = async () => {
                   "fridge, refrigerator",
                   "ac, air conditioner",
                   "book, books",
-                  "kitchen, cookware, utensils"
-                ]
-              }
+                  "kitchen, cookware, utensils",
+                ],
+              },
             },
             analyzer: {
               custom_analyzer: {
                 tokenizer: "standard",
-                filter: [
-                  "lowercase",
-                  "synonym_filter",
-                  "porter_stem"
-                ]
-              }
-            }
-          }
+                filter: ["lowercase", "synonym_filter", "porter_stem"],
+              },
+            },
+          },
         },
         mappings: {
           properties: {
             proname: {
               type: "text",
-              analyzer: "custom_analyzer"
+              analyzer: "custom_analyzer",
             },
             description: {
               type: "text",
-              analyzer: "custom_analyzer"
+              analyzer: "custom_analyzer",
             },
             price: { type: "float" },
             catid: { type: "integer" },
-            dateinserted: { type: "date" }
-          }
-        }
-      }
+            dateinserted: { type: "date" },
+          },
+        },
+      },
     });
 
     console.log("✅ Synonym-enabled index created");
-
   } catch (error) {
     console.error(error);
   }
